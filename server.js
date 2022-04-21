@@ -20,11 +20,15 @@ app.use(bodyParser.urlencoded({extended:true}));
 
 // routers
 const router = require('./routes/router.js')
+const routerSeller = require('./routes/routerSeller.js')
 app.use('/api', router)
+app.use('/api/seller', routerSeller)
 
 // static Image folder /public/images/profile_images
+//profile image
 app.use('/public/images/profile_images', express.static('./public/images/profile_images'))
-
+//advertisements images
+app.use('/public/images/advertisements_images', express.static('./public/images/advertisements_images'))
 
 // port
 
