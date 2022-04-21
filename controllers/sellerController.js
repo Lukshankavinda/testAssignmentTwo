@@ -15,7 +15,7 @@ const register = async (req, res) =>{
    	const seller_tpno = req.body.seller_tpno;
 
 	// username min length 3
-	if (!req.body.user_name || req.body.user_name.length < 5) {
+	if (!req.body.user_name || req.body.user_name.length < 3) {
 		return res.status(400).send({
 		  msg: 'Please enter a username with min. 5 chars'
 		});

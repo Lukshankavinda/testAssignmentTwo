@@ -39,11 +39,10 @@ const login = async (req, res) =>{
                 }else{
                     const token = jwt.sign({
                         username: user_name,
-                        userId: result[0].seller_id,
-                        password: result[0].password
+                        userId: result[0].seller_id
                     },
                     "SECRETKEY",
-                    {expiresIn:'7d'}
+                    {expiresIn:'1d'}
                     );
                     return res.status(200).send({
                         msg: 'ok ',

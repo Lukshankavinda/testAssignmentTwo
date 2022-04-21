@@ -1,4 +1,5 @@
 const router = require('express').Router()
+const auth = require('./auth.js');
 const jwt = require('jsonwebtoken');
 const db = require('../config/dbConfig.js');
 
@@ -8,7 +9,7 @@ const userController = require('../controllers/userController.js');
 const advertisementController = require('../controllers/advertisementController.js');
 
 // http://localhost:5000/api/seller/addProfileImage 
-router.post('/addProfileImage',profileController.uploadProfileImage, profileController.addProfileImage) 
+router.post('/addProfileImage',auth,profileController.uploadProfileImage, profileController.addProfileImage) 
 
 // http://localhost:5000/api/seller/addAdvertisement
 router.post('/addAdvertisement',advertisementController.uploadAdvImage, advertisementController.addAdvertisement) 

@@ -47,6 +47,9 @@ const addProfileImage = async (req, res) =>{
 		    photo: photo
 	   		
     	});
+		return res.status(200).send({
+			msg: 'Profile image upload sucsessfull'
+		});
 }
 
 
