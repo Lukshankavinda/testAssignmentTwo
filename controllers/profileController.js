@@ -3,6 +3,7 @@ const db = require('../models')
 //image upload
 const multer = require('multer')
 const path = require('path')
+const { request } = require('http')
 
 
 //create main modele for upload image
@@ -39,8 +40,9 @@ const uploadProfileImage = multer({
 
 const addProfileImage = async (req, res) =>{
 
-   		const seller_id = req.body.seller_id;
+   		const seller_id = req.user.userId;
    		const photo = req.file.path;
+		
 
    		Profile.create({
    			seller_id: seller_id,
@@ -49,6 +51,7 @@ const addProfileImage = async (req, res) =>{
     	});
 		return res.status(200).send({
 			msg: 'Profile image upload sucsessfull'
+			
 		});
 }
 
