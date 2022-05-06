@@ -1,5 +1,6 @@
 const db = require('../models')
 const jwt = require("jsonwebtoken");
+const bcrypt = require('bcrypt')
 
 //create main modele Seller & User
 const Seller = db.sellers
@@ -38,14 +39,13 @@ const register = async (req, res) =>{
 			});
 			} 
 			else{
-				const password = req.body.password;
-				const re_Password = req.body.re_Password;
 				// password (repeat) does not match
-				if ( !re_Password || password != re_Password ) {
+				if ( !req.body.re_Password || req.body.password != req.body.re_Password) {
 					return res.status(400).send({
 						msg: 'Both passwords must match'
 					});
 				} else{
+					const hashPassword = await bcrypt.hash(req.body.password, 10);
 					Seller.create({
 						seller_id: seller_id,
 						seller_name: seller_name,
@@ -57,7 +57,7 @@ const register = async (req, res) =>{
 					User.create({
 						seller_id: seller_id,
 						user_name: user_name,
-						password: password
+						password: hashPassword
 					});
 						
 					return res.status(200).send({
@@ -68,6 +68,10 @@ const register = async (req, res) =>{
 		}
 	}	
 }
+
+//
+
+
 
 
 module.exports = {

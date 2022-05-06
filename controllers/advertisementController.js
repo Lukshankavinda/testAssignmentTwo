@@ -37,13 +37,13 @@ const uploadAdvImage = multer({
 //1. add  new Advertisement
 const addAdvertisement = async (req, res) =>{
 
-   		const seller_id = req.body.seller_id;
+   		const seller_id = req.user.userId;
         const advertisement_id = seller_id+'_'+Date.now().toString();
         const condition = req.body.condition;
         const city = req.body.city;
         const category = req.body.category;
         const topic = req.body.topic;
-        const description = req.body. description;
+        const description = req.body.description;
         const price = req.body.price;
         const nagotiable = req.body.nagotiable;
         const Photo = req.file.path;
@@ -92,9 +92,9 @@ const getAllAdvertisementsByCategory = async (req,res) =>{
     res.status(200).send(adv)
 }
 
-//4. get all Advertisements by seller_id
+//4. get my Advertisements by seller_id
 const getAllMyAdvertisements = async (req,res) =>{
-    let seller_id =req.params.id
+    let seller_id =req.user.userId;
     let adv = await Advertisement.findAll({ 
         attributes:['topic','city','category','Photo','price'],
         where: {seller_id:seller_id}})
@@ -112,34 +112,35 @@ const getSingleAdvertisement = async (req,res) =>{
 
 //7. Delete the Advertisement using advertisement_id
 const deleteAdvertisement = async (req,res)=>{
-    let id =req.params.id
-    await Item.destroy({where :{advertisement_id :id}})
+    let adv_id =req.params.adv_id
+    Advertisement.destroy({where :{advertisement_id : adv_id}})
     res.status(200).send('Advertisement is deleted !')
 }
 
 //8.  Advertisement per page
+
 const AdvertisementPerPage = async (req,res) =>{
-    let limit =3;
-    let offset =0;
-
-    Advertisement.findAndCountAll()
-    .then((data)=>{
-        let page =req.params.page;
-        let pages = Math.ceil(data.count/limit);
-
-        offset =limit*(page-1);
-
-        Advertisement.findAll({
-            attributes:['topic','city','category','Photo','price'],
-            limit: limit,
-            offset: offset,
-            $sort: { id: 1 }
+        let limit =2;
+        let offset =0;
+    
+        db.advertisements.findAndCountAll()
+        .then((data)=>{
+            let page =req.params.page;
+            let pages = Math.ceil(data.count/limit);
+    
+            offset =limit*(page-1);
+    
+            db.advertisements.findAll({
+                attributes:['topic','city','category','Photo','price'],
+                limit: limit,
+                offset: offset,
+                $sort: { id: 1 }
+            })
+            .then((users)=>{
+                res.status(200).json({'result': users, 'count': data.count, 'pages': pages});
+            });
         })
-        .then((users)=>{
-            res.status(200).json({'result': users, 'count': data.count, 'pages': pages});
-        });
-    })
-}
+    }
 
 
 module.exports = {

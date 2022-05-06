@@ -1,5 +1,6 @@
 const db = require('../models')
 const jwt = require("jsonwebtoken");
+const bcrypt = require('bcrypt');
 
 //create main modele User
 const User = db.users
@@ -23,7 +24,7 @@ const login = async (req, res) =>{
         }
         else{
             const password = req.body.password;
-            let result = await User.findAll({ 
+            let result = await User.findOne({ 
                 attributes:['seller_id','password'],
                 where: {user_name:user_name}
             })
@@ -32,14 +33,14 @@ const login = async (req, res) =>{
                     msg: 'Please enter valid user name  '
                 });
             }else{
-                if(result[0].password != password){
+                if( await bcrypt.compare(password, User.password) ){
                     return res.status(400).send({
                         msg: 'Please enter valid user password '
                     });
                 }else{
                     const token = jwt.sign({
                         username: user_name,
-                        userId: result[0].seller_id
+                        userId: result.seller_id
                     },
                     "SECRETKEY",
                     {expiresIn:'1d'}
