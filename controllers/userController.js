@@ -15,7 +15,7 @@ const login = async (req, res) =>{
 		});
 	}
 	else{
-        const user_name = req.body.user_name;
+        const username = req.body.user_name;
         // password is input or not
         if (!req.body.password ) {
             return res.status(400).send({
@@ -26,33 +26,40 @@ const login = async (req, res) =>{
             const password = req.body.password;
             let result = await User.findOne({ 
                 attributes:['seller_id','password'],
-                where: {user_name:user_name}
+                where: {user_name:username}
             })
             if(!result){
                 return res.status(400).send({
                     msg: 'Please enter valid user name  '
                 });
             }else{
-                if( await bcrypt.compare(password, User.password) ){
-                    return res.status(400).send({
+                // check password
+                bcrypt.compare(password, result['password'],(bErr, bResult) => {
+                    // wrong password
+                    if (bErr) {
+                        return res.status(401).send({
+                            msg: 'Username or password is incorrect!'
+                        });
+                        throw bErr;
+                    }
+                    if (bResult) {
+                        const token = jwt.sign({
+                            username: username,
+                            userId: result.seller_id
+                        },
+                        "SECRETKEY",
+                        {expiresIn:'1d'});
+                        return res.status(200).send({
+                            msg: 'ok ',
+                            username,
+                            password,
+                            token,
+                        });
+                    }
+                    return res.status(401).send({
                         msg: 'Please enter valid user password '
                     });
-                }else{
-                    const token = jwt.sign({
-                        username: user_name,
-                        userId: result.seller_id
-                    },
-                    "SECRETKEY",
-                    {expiresIn:'1d'}
-                    );
-                    return res.status(200).send({
-                        msg: 'ok ',
-                        user_name,
-                        password,
-                        token,
-                    });
-                }
-
+                });
             }
         }
     }
